@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L7 DDoS Attack Tester</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f2f5;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .flag {
+            margin-bottom: 20px;
+        }
+        .flag img {
+            max-width: 100%;
+            height: auto;
+            width: 120px;
+            border-radius: 5px;
+        }
+        .pussy {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: #007bff;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .paiyotka, .status {
+            font-size: 1.5em;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #007bff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #007bff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .button-container input {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 1em;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 5px 0;
+        }
+        .button-container button:hover {
+            background: #0056b3;
+        }
+        .copy-link {
+            margin-top: 10px;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+        @media (max-width: 600px) {
+            .header {
+                font-size: 2em;
+                padding: 10px 20px;
+            }
+            .counter, .status {
+                font-size: 1.2em;
+                padding: 15px;
+            }
+            .button-container input, .button-container button {
+                width: 90%;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="flag">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Flag_of_the_Philippines.svg/2560px-Flag_of_the_Philippines.svg.png" alt="Philippines Flag">
+        </div>
+        <div class="pussy">
+            L7 DDoS Attack Tester
+        </div>
+        <div class="paiyotka" id="requestCounter">
+            Number of Requests: 0
+        </div>
+        <div class="status" id="serverStatus">
+            Server Status: Loading...
+        </div>
+        <div class="button-container">
+            <input type="text" id="website" value="" readonly>
+            <button onclick="copyLink()">Copy</button>
+            <button onclick="resetCounter()">Reset Counter</button>
+        </div>
+    </div>
+
+    <script>
+        async function updateData() {
+            try {
+                const response = await fetch('/count');
+                const data = await response.json();
+                document.getElementById('requestCounter').innerText = 'Number of Requests: ' + data.requestCount;
+            } catch (error) {
+                console.error('Error fetching request count:', error);
+            }
+        }
+
+        async function fetchStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                document.getElementById('serverStatus').innerText = 'Server Status: ' + data.status;
+            } catch (error) {
+                document.getElementById('serverStatus').innerText = 'Server Status: Error fetching status';
+                console.error('Error fetching server status:', error);
+            }
+        }
+
+        async function resetCounter() {
+            try {
+                await fetch('/reset', { method: 'POST' });
+                updateData();
+            } catch (error) {
+                console.error('Error resetting counter:', error);
+            }
+        }
+
+        function copyLink() {
+            const link = document.getElementById('website');
+            link.select();
+            link.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            alert('Link copied to clipboard');
+        }
+
+        setInterval(() => {
+            updateData();
+            fetchStatus();
+        }, 1000);
+    </script>
+</body>
+</html>
